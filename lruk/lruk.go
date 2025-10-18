@@ -1,6 +1,7 @@
 package lruk
 
 import (
+	"github.com/dark-vinci/nildb/lruk/frame"
 	"sync"
 
 	"github.com/dark-vinci/nildb/interfaces"
@@ -12,6 +13,7 @@ type LRUKCache struct {
 	capacity      int
 	accessHistory map[int][]int64
 	evictable     map[int]bool
+	Buffer        []frame.Frame
 }
 
 func NewLRUKCache(capacity int, k int) *LRUKCache {

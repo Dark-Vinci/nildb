@@ -28,11 +28,16 @@ func NewBlock[T interfaces.IOOperator](
 }
 
 func (b *Block[T]) Write(pageNumber int, buff []byte) error {
-	var (
-		capacity    int
-		blockOffset int
-		pageOffset  int
-	)
+	offset := int64(b.pageSize * pageNumber)
+
+	if _, err := b.ioOperator.Seek(offset, io.SeekStart); err != nil {
+		fmt.Println("Seek error:", err)
+		return err
+	}
+
+	if _, err := b.ioOperator.Write(buff); err != nil {
+		return err
+	}
 
 	return nil
 }
@@ -42,7 +47,11 @@ func (b *Block[T]) Flush() error {
 }
 
 func (b *Block[T]) Sync() error {
-	return b.ioOperator.Sync()
+	if err := b.ioOperator.Sync(); err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func (b *Block[T]) Read(pageNumber int, buff []byte) error {
