@@ -25,6 +25,7 @@ func (c *Cache) MustEvictDirtyPage() bool {
 	}
 
 	victim := c.findVictim()
+
 	return c.Buffer[victim].IsSet(constants.DirtyFlag)
 }
 

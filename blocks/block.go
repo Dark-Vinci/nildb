@@ -7,27 +7,27 @@ import (
 	"github.com/dark-vinci/nildb/interfaces"
 )
 
-type Block[T interfaces.IOOperator] struct {
-	ioOperator T
+type Block struct {
+	ioOperator interfaces.IOOperator
 	blockSize  int
 	pageSize   int
 }
 
 var _ interfaces.BlockOperations = (*Block)(nil)
 
-func NewBlock[T interfaces.IOOperator](
-	ioOperator T,
+func NewBlock(
+	ioOperator interfaces.IOOperator,
 	blockSize int,
 	pageSize int,
-) *Block[T] {
-	return &Block[T]{
+) *Block {
+	return &Block{
 		ioOperator: ioOperator,
 		blockSize:  blockSize,
 		pageSize:   pageSize,
 	}
 }
 
-func (b *Block[T]) Write(pageNumber int, buff []byte) error {
+func (b *Block) Write(pageNumber int, buff []byte) error {
 	offset := int64(b.pageSize * pageNumber)
 
 	if _, err := b.ioOperator.Seek(offset, io.SeekStart); err != nil {
@@ -42,11 +42,11 @@ func (b *Block[T]) Write(pageNumber int, buff []byte) error {
 	return nil
 }
 
-func (b *Block[T]) Flush() error {
+func (b *Block) Flush() error {
 	return nil
 }
 
-func (b *Block[T]) Sync() error {
+func (b *Block) Sync() error {
 	if err := b.ioOperator.Sync(); err != nil {
 		return err
 	}
@@ -54,7 +54,7 @@ func (b *Block[T]) Sync() error {
 	return nil
 }
 
-func (b *Block[T]) Read(pageNumber int, buff []byte) error {
+func (b *Block) Read(pageNumber int, buff []byte) error {
 	var (
 		capacity    int
 		blockOffset int

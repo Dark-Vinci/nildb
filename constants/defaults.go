@@ -1,5 +1,7 @@
 package constants
 
+import "time"
+
 const (
 	DefaultMaxCacheSize       = 1000      // Example value
 	MinCacheSize              = 10        // Example value
@@ -9,4 +11,6 @@ const (
 	DefaultCRP                = uint64(0) // Default correlated reference period (logical accesses)
 	DirtyFlag                 = 0x02
 	PinnedFlag                = 0x04
+	BatchSize                 = 100
+	BatchTimeout              = time.Millisecond * 10
 )
