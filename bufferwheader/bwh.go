@@ -15,6 +15,10 @@ type BufferWithHeader[H any] struct {
 	size    int
 }
 
+func (bwh *BufferWithHeader[H]) Size() int {
+	return bwh.size
+}
+
 func Allocate[H any](size int) []byte {
 	var (
 		header     H
