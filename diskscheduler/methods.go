@@ -5,7 +5,7 @@ import (
 	"github.com/dark-vinci/nildb/interfaces"
 )
 
-func (w *DiskWorker) Read(pageNumber base.PageNumber, page interfaces.RepPage) chan interfaces.DiskResult {
+func (w *DiskWorker) Read(pageNumber base.PageNumber, page interfaces.PageHandle) chan interfaces.DiskResult {
 	resultChan := make(chan interfaces.DiskResult, 1)
 
 	w.queue <- interfaces.DiskRequest{
@@ -18,7 +18,7 @@ func (w *DiskWorker) Read(pageNumber base.PageNumber, page interfaces.RepPage) c
 	return resultChan
 }
 
-func (w *DiskWorker) Write(pageNumber base.PageNumber, page interfaces.RepPage) chan interfaces.DiskResult {
+func (w *DiskWorker) Write(pageNumber base.PageNumber, page interfaces.PageHandle) chan interfaces.DiskResult {
 	resultChan := make(chan interfaces.DiskResult, 1)
 
 	w.queue <- interfaces.DiskRequest{

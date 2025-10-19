@@ -2,24 +2,29 @@ package pager
 
 import (
 	"container/heap"
-	"fmt"
 	"os"
+	"strings"
 
 	"github.com/dark-vinci/nildb/base"
 	"github.com/dark-vinci/nildb/constants"
 	"github.com/dark-vinci/nildb/frame"
 	"github.com/dark-vinci/nildb/interfaces"
+	"github.com/dark-vinci/nildb/pages"
 )
 
-func (p *Pager) GetNewPage(pin bool) (*interfaces.RepPage, base.PageNumber, error) {
-	pn := p.AllocatePage()
-	page, err := p.GetPage(pn, pin)
-	if err != nil {
+func (p *Pager) GetNewPage(pin bool) (*interfaces.PageHandle, base.PageNumber, error) {
+	var (
+		pn        = p.AllocatePage()
+		page, err = p.GetPage(pn, pin)
+	)
+
+	if err != nil || page == nil {
 		return nil, 0, err
 	}
+
 	p.cache.MarkDirty(pn)
-	// Initialize the page if needed
-	return page, pn, nil
+
+	return &(*page).Page, pn, nil
 }
 
 func (p *Pager) AllocatePage() base.PageNumber {
@@ -36,10 +41,12 @@ func (p *Pager) AllocatePage() base.PageNumber {
 	return pn
 }
 
+// ReleasePage unpin the page
 func (p *Pager) ReleasePage(pn base.PageNumber) {
 	p.cache.Unpin(pn)
 }
 
+// Stop the worker
 func (p *Pager) Stop() {
 	p.worker.Stop()
 }
@@ -60,36 +67,35 @@ func (p *Pager) GetPage(pn base.PageNumber, pin bool) (*frame.Frame, error) {
 	}
 
 	// Cache miss, need to evict if full and load
-	//if p.cache.Size() >= p.cache.MaxSize() {
-	//	victimID := p.cache.findVictim()
-	//	victimFrame := p.cache.GetFrame(victimID).(frame.Frame)
-	//
-	//	if victimFrame.IsSet(constants.DirtyFlag) {
-	//		resultChan := p.worker.Write(victimFrame.PageNumber, victimFrame.Page)
-	//
-	//		result := <-resultChan
-	//		if result.Error != nil {
-	//			return nil, result.Error
-	//		}
-	//
-	//		p.cache.MarkClean(victimFrame.PageNumber)
-	//	}
-	//}
+	if p.cache.Size() >= p.cache.MaxSize() {
+		victimID := p.cache.FindVictim()
+		victimFrame := p.cache.GetFrame(victimID).(frame.Frame)
+
+		if victimFrame.IsSet(constants.DirtyFlag) {
+			resultChan := p.worker.Write(victimFrame.PageNumber, victimFrame.Page)
+
+			result := <-resultChan
+			if result.Error != nil {
+				return nil, result.Error
+			}
+
+			p.cache.MarkClean(victimFrame.PageNumber)
+		}
+	}
 
 	// EVICT IF NEEDED
 	frameID2 := p.cache.Map(pn)
 
 	// Load from disk
-	frame := p.cache.GetFrame(frameID2)
+	fram := p.cache.GetFrame(frameID2).(*frame.Frame)
 
-	resultChan := p.worker.Read(pn, frame.Page)
+	resultChan := p.worker.Read(pn, (*fram).Page)
 	result := <-resultChan
 
 	if result.Error != nil {
-		if os.IsNotExist(result.Error) || fmt.Sprint(result.Error).Contains("not found") {
+		if os.IsNotExist(result.Error) || strings.Contains(result.Error.Error(), "file does not exist") {
 			// Initialize empty page
-			// Assume interfaces.RepPage has a New method or something
-			frame.Page.FromBytes(make([]byte, p.cache.PageSize)) // or initialize
+			fram.Page = pages.Alloc(p.cache.PageSize())
 		} else {
 			return nil, result.Error
 		}
@@ -99,5 +105,5 @@ func (p *Pager) GetPage(pn base.PageNumber, pin bool) (*frame.Frame, error) {
 		p.cache.Pin(pn)
 	}
 
-	return &frame.Page, nil
+	return fram, nil
 }

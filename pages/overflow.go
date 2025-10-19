@@ -19,8 +19,14 @@ func (o *OverflowPage) IsOverflow() bool {
 	return true
 }
 
-func (o *OverflowPage) IntoBuffer() interface{} {
-	return o.buffer
+func (o *OverflowPage) FromBuffer(buffer []byte) interfaces.PageHandle {
+	o.buffer = bufferwheader.FromSlice[OverflowPageHeader](buffer)
+
+	return o
+}
+
+func (o *OverflowPage) IntoBuffer() (interface{}, error) {
+	return o.buffer, nil
 }
 
 func (o *OverflowPage) FromPageHeader(buffer *bufferwheader.BufferWithHeader[PageHeader]) interfaces.PageHandle {

@@ -2,5 +2,6 @@ package interfaces
 
 type PageHandle interface {
 	IsOverflow() bool
-	IntoBuffer() interface{}
+	IntoBuffer() (interface{}, error)
+	FromBuffer([]byte) PageHandle
 }

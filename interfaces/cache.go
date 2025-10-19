@@ -25,4 +25,7 @@ type Cache interface {
 	Lock()
 	Unlock()
 	MaxSize() int
+
+	FindVictim() base.FrameID
+	PageSize() int
 }

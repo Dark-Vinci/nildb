@@ -7,9 +7,10 @@ import (
 	"github.com/dark-vinci/nildb/constants"
 	"github.com/dark-vinci/nildb/frame"
 	"github.com/dark-vinci/nildb/interfaces"
+	"github.com/dark-vinci/nildb/pages"
 )
 
-func (c *Cache) Load(pageNumber base.PageNumber, page *interfaces.RepPage) *interfaces.RepPage {
+func (c *Cache) Load(pageNumber base.PageNumber, page *interfaces.PageHandle) *interfaces.PageHandle {
 	frameID := c.Map(pageNumber)
 	oldPage := c.Buffer[frameID].Page
 
@@ -112,14 +113,14 @@ func (c *Cache) Map(pageNumber base.PageNumber) base.FrameID {
 	var frameID base.FrameID
 	f := &frame.Frame{}
 
-	// Buffer not full, allocate new page
+	// Buffer is not full, allocate new page
 	if uint(len(c.Buffer)) < c.MaxSize {
 		frameID = base.FrameID(len(c.Buffer))
-		f = frame.NewFrame(pageNumber, MemPage{Data: make([]byte, c.PageSize)})
+		f = frame.NewFrame(pageNumber, pages.Alloc(int(c.PageSize)))
 
 		c.Buffer = append(c.Buffer, f)
 	} else {
-		// Buffer full, find victim to evict
+		// Buffer full, find a victim to evict
 		victimID := c.findVictim()
 
 		f = c.Buffer[victimID]
@@ -223,6 +224,6 @@ func (c *Cache) Invalidate(pageNumber base.PageNumber) {
 }
 
 // GetFrame retrieves the MemPage for a given FrameId
-func (c *Cache) GetFrame(frameID base.FrameID) *interfaces.RepPage {
+func (c *Cache) GetFrame(frameID base.FrameID) *interfaces.PageHandle {
 	return &c.Buffer[frameID].Page
 }

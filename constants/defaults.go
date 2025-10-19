@@ -14,7 +14,7 @@ const (
 	BatchSize                 = 100
 	BatchTimeout              = time.Millisecond * 10
 	PageAlignment             = 4096
-	MIN_PAGE_SIZE             = 512   // Minimum page size.
-	MAX_PAGE_SIZE             = 65536 // Maximum page size.
-	CELL_ALIGNMENT            = 8
+	MinPageSize               = 512   // Minimum page size.
+	MaxPageSize               = 65536 // Maximum page size.
+	CellAlignment             = 8
 )

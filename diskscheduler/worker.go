@@ -127,7 +127,7 @@ func (w *DiskWorker) processRead(req interfaces.DiskRequest) {
 }
 
 func (w *DiskWorker) processWrite(req interfaces.DiskRequest) {
-	data, err := req.Page.ToBytes()
+	data, err := req.Page.IntoBuffer()
 
 	if err != nil {
 		req.ResultChan <- interfaces.DiskResult{
@@ -139,7 +139,7 @@ func (w *DiskWorker) processWrite(req interfaces.DiskRequest) {
 	}
 
 	w.lock.Lock()
-	err = w.blockIO.Write(int(req.PageNumber), data)
+	err = w.blockIO.Write(int(req.PageNumber), data.([]byte))
 	w.lock.Unlock()
 
 	result := interfaces.DiskResult{PageNumber: req.PageNumber, Page: req.Page}

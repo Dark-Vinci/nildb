@@ -9,8 +9,8 @@ import (
 )
 
 func ForPage[H any](size int) *BufferWithHeader[H] {
-	if size < constants.MIN_PAGE_SIZE || size > constants.MAX_PAGE_SIZE {
-		panic(fmt.Sprintf("INVALID: Page size %v is not between range %v and %v", size, constants.MIN_PAGE_SIZE, constants.MAX_PAGE_SIZE))
+	if size < constants.MinPageSize || size > constants.MaxPageSize {
+		panic(fmt.Sprintf("INVALID: Page size %v is not between range %v and %v", size, constants.MinPageSize, constants.MaxPageSize))
 	}
 
 	return NewBufferWithHeader[H](size)
@@ -28,8 +28,8 @@ func FromSlice[H any](data []byte) *BufferWithHeader[H] {
 
 	ptr := unsafe.Pointer(&data[0])
 
-	if uintptr(ptr)%constants.CELL_ALIGNMENT != 0 {
-		panic(fmt.Sprintf("Attempt to create a BufferWithHeader[%T] from an unaligned pointer %v with %v", header, uintptr(ptr), constants.CELL_ALIGNMENT))
+	if uintptr(ptr)%constants.CellAlignment != 0 {
+		panic(fmt.Sprintf("Attempt to create a BufferWithHeader[%T] from an unaligned pointer %v with %v", header, uintptr(ptr), constants.CellAlignment))
 	}
 
 	headerPtr := (*H)(ptr)

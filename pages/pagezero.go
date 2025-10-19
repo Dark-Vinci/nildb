@@ -25,8 +25,14 @@ func (p *PageZero) asBtreePage() *Page {
 	}
 }
 
-func (p *PageZero) IntoBuffer() interface{} {
-	return p.buffer
+func (p *PageZero) IntoBuffer() (interface{}, error) {
+	return p.buffer, nil
+}
+
+func (p *PageZero) FromBuffer(buffer []byte) interfaces.PageHandle {
+	p.buffer = bufferwheader.FromSlice[DBHeader](buffer)
+
+	return p
 }
 
 func (p *PageZero) FromPageHeader(buffer *bufferwheader.BufferWithHeader[PageHeader]) interfaces.PageHandle {
