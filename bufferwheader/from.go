@@ -5,6 +5,7 @@ import (
 	"unsafe"
 
 	"github.com/dark-vinci/nildb/constants"
+	"github.com/dark-vinci/nildb/utils"
 )
 
 func ForPage[H any](size int) *BufferWithHeader[H] {
@@ -18,7 +19,7 @@ func ForPage[H any](size int) *BufferWithHeader[H] {
 func FromSlice[H any](data []byte) *BufferWithHeader[H] {
 	var (
 		header     H
-		headerSize = getSize(header)
+		headerSize = utils.GetSize(header)
 	)
 
 	if len(data) < headerSize {
@@ -43,7 +44,7 @@ func FromSlice[H any](data []byte) *BufferWithHeader[H] {
 
 func Cast[H, T any](b *BufferWithHeader[H]) *BufferWithHeader[T] {
 	var t T
-	headerSize := getSize(t)
+	headerSize := utils.GetSize(t)
 
 	if b.size <= headerSize {
 		panic(fmt.Sprintf(

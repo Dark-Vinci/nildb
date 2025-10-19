@@ -2,10 +2,10 @@ package bufferwheader
 
 import (
 	"fmt"
-	"reflect"
 	"unsafe"
 
 	"github.com/dark-vinci/nildb/constants"
+	"github.com/dark-vinci/nildb/utils"
 )
 
 // BufferWithHeader buffer with header
@@ -15,14 +15,10 @@ type BufferWithHeader[H any] struct {
 	size    int
 }
 
-func getSize[T any](value T) int {
-	return int(reflect.TypeOf(value).Size())
-}
-
 func Allocate[H any](size int) []byte {
 	var (
 		header     H
-		headerSize = getSize(header)
+		headerSize = utils.GetSize(header)
 	)
 
 	if headerSize >= size {
@@ -43,7 +39,7 @@ func NewBufferWithHeader[H any](size int) *BufferWithHeader[H] {
 	var (
 		header      H
 		emptyBuffer = Allocate[H](size)
-		headerSize  = getSize(header)
+		headerSize  = utils.GetSize(header)
 		headerPtr   = (*H)(unsafe.Pointer(&emptyBuffer[0]))
 	)
 
