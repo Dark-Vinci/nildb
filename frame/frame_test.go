@@ -13,6 +13,16 @@ type MockRepPage struct {
 	overflow bool
 }
 
+func (m *MockRepPage) ToBytes() ([]byte, error) {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (m *MockRepPage) FromBytes(bytes []byte) error {
+	//TODO implement me
+	panic("implement me")
+}
+
 func (m *MockRepPage) Type() string {
 	return "MockRepPage"
 }

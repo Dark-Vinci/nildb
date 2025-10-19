@@ -6,6 +6,8 @@ import (
 	"os"
 
 	"github.com/dark-vinci/nildb/base"
+	"github.com/dark-vinci/nildb/constants"
+	"github.com/dark-vinci/nildb/frame"
 	"github.com/dark-vinci/nildb/interfaces"
 )
 
@@ -43,10 +45,8 @@ func (p *Pager) Stop() {
 }
 
 // GetPage retrieves a page from cache or disk
-func (p *Pager) GetPage(pn base.PageNumber, pin bool) (*interfaces.RepPage, error) {
-	p.cache.RLock()
-	frameID := p.cache.GetPage(pn)
-	p.cache.RUnlock()
+func (p *Pager) GetPage(pn base.PageNumber, pin bool) (*frame.Frame, error) {
+	frameID := p.cache.GetFrameID(pn)
 
 	// PAGE IS IN CACHE
 	if frameID != nil {
@@ -54,44 +54,33 @@ func (p *Pager) GetPage(pn base.PageNumber, pin bool) (*interfaces.RepPage, erro
 			p.cache.Pin(pn)
 		}
 
-		p.cache.RLock()
-		page := p.cache.GetFrame(base.FrameID(*frameID))
-		p.cache.RUnlock()
+		page := p.cache.GetFrame(*frameID).(*frame.Frame)
 
 		return page, nil
 	}
 
 	// Cache miss, need to evict if full and load
-	p.cache.Lock()
+	//if p.cache.Size() >= p.cache.MaxSize() {
+	//	victimID := p.cache.findVictim()
+	//	victimFrame := p.cache.GetFrame(victimID).(frame.Frame)
+	//
+	//	if victimFrame.IsSet(constants.DirtyFlag) {
+	//		resultChan := p.worker.Write(victimFrame.PageNumber, victimFrame.Page)
+	//
+	//		result := <-resultChan
+	//		if result.Error != nil {
+	//			return nil, result.Error
+	//		}
+	//
+	//		p.cache.MarkClean(victimFrame.PageNumber)
+	//	}
+	//}
 
-	if p.cache.Size() >= p.cache.MaxSize() {
-		victimID := p.cache.findVictim()
-		victimFrame := p.cache.GetFrame(victimID)
-
-		p.cache.Unlock() // Unlock before I/O
-		if victimFrame.IsSet(DirtyFlag) {
-			resultChan := p.worker.Write(victimFrame.PageNumber, victimFrame.Page)
-
-			result := <-resultChan
-			if result.Error != nil {
-				return nil, result.Error
-			}
-
-			p.cache.Lock()
-			p.cache.MarkClean(victimFrame.PageNumber)
-			p.cache.Unlock()
-		}
-
-		p.cache.Lock()
-	}
-
-	frameId2 := p.cache.Map(pn)
-	p.cache.Unlock()
+	// EVICT IF NEEDED
+	frameID2 := p.cache.Map(pn)
 
 	// Load from disk
-	p.cache.RLock()
-	frame := p.cache.Buffer[frameId2]
-	p.cache.RUnlock()
+	frame := p.cache.GetFrame(frameID2)
 
 	resultChan := p.worker.Read(pn, frame.Page)
 	result := <-resultChan

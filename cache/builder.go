@@ -4,8 +4,8 @@ import (
 	"fmt"
 
 	"github.com/dark-vinci/nildb/base"
-	"github.com/dark-vinci/nildb/cache/frame"
 	"github.com/dark-vinci/nildb/constants"
+	"github.com/dark-vinci/nildb/frame"
 )
 
 type Builder struct {

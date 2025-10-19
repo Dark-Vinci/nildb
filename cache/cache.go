@@ -2,7 +2,7 @@ package cache
 
 import (
 	"github.com/dark-vinci/nildb/base"
-	"github.com/dark-vinci/nildb/cache/frame"
+	"github.com/dark-vinci/nildb/frame"
 )
 
 type Cache struct {

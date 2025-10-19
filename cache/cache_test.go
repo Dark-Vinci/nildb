@@ -1,9 +1,11 @@
 package cache
 
 import (
-	"github.com/dark-vinci/nildb/constants"
 	"reflect"
 	"testing"
+
+	"github.com/dark-vinci/nildb/base"
+	"github.com/dark-vinci/nildb/constants"
 )
 
 // TestMapAndGet verifies mapping and retrieving pages
@@ -123,7 +125,7 @@ func TestPinning(t *testing.T) {
 	if c.PinnedPages != 0 {
 		t.Errorf("Expected 0 pinned pages, got %d", c.PinnedPages)
 	}
-	if c.Buffer[c.Pages[1]].IsSet(PinnedFlag) {
+	if c.Buffer[c.Pages[1]].IsSet(constants.PinnedFlag) {
 		t.Errorf("Expected page 1 to have pinned flag unset")
 	}
 }
@@ -187,18 +189,18 @@ func TestGetManyMut(t *testing.T) {
 	c.Map(3)
 
 	// Get multiple mutable pages
-	pages := c.GetManyMut([]PageNumber{1, 2})
+	pages := c.GetMany([]PageNumber{1, 2})
 	if len(pages) != 2 {
 		t.Errorf("Expected 2 pages, got %d", len(pages))
 	}
-	for i, pn := range []PageNumber{1, 2} {
-		if !c.Buffer[c.Pages[pn]].IsSet(DirtyFlag) {
+	for _, pn := range []base.PageNumber{1, 2} {
+		if !c.Buffer[c.Pages[pn]].IsSet(constants.DirtyFlag) {
 			t.Errorf("Expected page %d to be marked dirty", pn)
 		}
 	}
 
 	// Try to get non-existent page
-	pages = c.GetManyMut([]PageNumber{1, 4})
+	pages = c.GetManyMut([]base.PageNumber{1, 4})
 	if pages != nil {
 		t.Errorf("Expected nil for non-existent page, got %v", pages)
 	}
@@ -218,6 +220,7 @@ func TestLoad(t *testing.T) {
 	if !reflect.DeepEqual(evicted, oldPage) {
 		t.Errorf("Expected evicted page %v, got %v", oldPage, evicted)
 	}
+
 	if !reflect.DeepEqual(c.GetFrame(c.Pages[2]).Data, newPage.Data) {
 		t.Errorf("Expected loaded page %v, got %v", newPage.Data, c.GetFrame(c.Pages[2]).Data)
 	}

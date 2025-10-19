@@ -6,3 +6,7 @@ type RepPage interface {
 	ToBytes() ([]byte, error)
 	FromBytes([]byte) error
 }
+
+func NewPage(pageSize uint) (RepPage, error) {
+
+}

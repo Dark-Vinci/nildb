@@ -4,8 +4,8 @@ import (
 	"math"
 
 	"github.com/dark-vinci/nildb/base"
-	"github.com/dark-vinci/nildb/cache/frame"
 	"github.com/dark-vinci/nildb/constants"
+	"github.com/dark-vinci/nildb/frame"
 	"github.com/dark-vinci/nildb/interfaces"
 )
 
@@ -100,6 +100,7 @@ func (c *Cache) setFlags(pageNumber base.PageNumber, flags uint8) bool {
 		c.Buffer[frameId].Set(flags)
 		return true
 	}
+
 	return false
 }
 
@@ -119,8 +120,9 @@ func (c *Cache) Map(pageNumber base.PageNumber) base.FrameID {
 		c.Buffer = append(c.Buffer, f)
 	} else {
 		// Buffer full, find victim to evict
-		victimId := c.findVictim()
-		f = c.Buffer[victimId]
+		victimID := c.findVictim()
+
+		f = c.Buffer[victimID]
 
 		delete(c.Pages, f.PageNumber)
 
@@ -135,9 +137,11 @@ func (c *Cache) Map(pageNumber base.PageNumber) base.FrameID {
 	return frameID
 }
 
-func (c *Cache) updateHistory(frameId base.FrameID) {
-	fram := c.Buffer[frameId]
+func (c *Cache) updateHistory(frameID base.FrameID) {
+	fram := c.Buffer[frameID]
+
 	c.CurrentTime++
+
 	t := c.CurrentTime
 
 	if len(fram.History) == 0 {
