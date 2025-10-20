@@ -94,7 +94,7 @@ func (p *Pager) GetPage(pn base.PageNumber, pin bool) (*frame.Frame, error) {
 
 	if result.Error != nil {
 		if os.IsNotExist(result.Error) || strings.Contains(result.Error.Error(), "file does not exist") {
-			// Initialize empty page
+			// Initialize an empty page
 			fram.Page = pages.Alloc(p.cache.PageSize())
 		} else {
 			return nil, result.Error

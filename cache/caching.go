@@ -11,6 +11,10 @@ import (
 )
 
 func (c *Cache) Load(pageNumber base.PageNumber, page *interfaces.PageHandle) *interfaces.PageHandle {
+	if page == nil {
+		return nil
+	}
+
 	frameID := c.Map(pageNumber)
 	oldPage := c.Buffer[frameID].Page
 
@@ -34,7 +38,7 @@ func (c *Cache) findVictim() base.FrameID {
 	var (
 		t             = c.CurrentTime
 		minVal        = uint64(math.MaxUint64)
-		victim        = ^base.FrameID(0)
+		victim        = ^base.FrameID(0) // base.FrameID(uint64(math.MaxUint64))
 		foundEligible = false
 	)
 
@@ -110,10 +114,12 @@ func (c *Cache) Map(pageNumber base.PageNumber) base.FrameID {
 		return frameID
 	}
 
-	var frameID base.FrameID
-	f := &frame.Frame{}
+	var (
+		frameID base.FrameID
+		f       = &frame.Frame{}
+	)
 
-	// Buffer is not full, allocate new page
+	// Buffer is not full, allocate a new page
 	if uint(len(c.Buffer)) < c.MaxSize {
 		frameID = base.FrameID(len(c.Buffer))
 		f = frame.NewFrame(pageNumber, pages.Alloc(int(c.PageSize)))
