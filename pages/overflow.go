@@ -2,6 +2,7 @@ package pages
 
 import (
 	"github.com/dark-vinci/nildb/bufferwheader"
+	"github.com/dark-vinci/nildb/constants"
 	"github.com/dark-vinci/nildb/interfaces"
 )
 
@@ -43,4 +44,8 @@ func (o *OverflowPage) FromDBHeader(buffer *bufferwheader.BufferWithHeader[DBHea
 	return &OverflowPage{
 		buffer: bufferwheader.NewBufferWithHeader[OverflowPageHeader](buffer.Size()),
 	}
+}
+
+func (o *OverflowPage) Type() string {
+	return constants.OverFlowPage
 }

@@ -13,7 +13,6 @@ type IOOperator interface {
 	Remove() error
 	Truncate() error
 	Sync() error
-	//Flush() error
 	Create() (IOOperator, error)
 	Open() (IOOperator, error)
 }

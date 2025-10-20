@@ -2,6 +2,7 @@ package pages
 
 import (
 	"github.com/dark-vinci/nildb/bufferwheader"
+	"github.com/dark-vinci/nildb/constants"
 	"github.com/dark-vinci/nildb/interfaces"
 )
 
@@ -44,4 +45,8 @@ func (p *Page) FromDBHeader(buffer *bufferwheader.BufferWithHeader[DBHeader]) in
 	return &Page{
 		buffer: bufferwheader.NewBufferWithHeader[PageHeader](buffer.Size()),
 	}
+}
+
+func (p *Page) Type() string {
+	return constants.BTreePage
 }

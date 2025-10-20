@@ -1,8 +1,9 @@
 package bufferwheader
 
 import (
-	"reflect"
 	"unsafe"
+
+	"github.com/dark-vinci/nildb/utils"
 )
 
 func (bwh *BufferWithHeader[H]) Header() *H {
@@ -15,7 +16,7 @@ func (bwh *BufferWithHeader[H]) Content() []byte {
 
 func (bwh *BufferWithHeader[H]) UsableSpace() uint16 {
 	var h H
-	return uint16(bwh.size - int(reflect.TypeOf(h).Size()))
+	return uint16(bwh.size - utils.GetSize(h))
 }
 
 func (bwh *BufferWithHeader[H]) AsSlice() []byte {

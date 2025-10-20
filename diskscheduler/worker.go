@@ -33,6 +33,7 @@ func NewDiskWorker(block blocks.Block) *DiskWorker {
 	}
 
 	worker.waitGroup.Add(1)
+
 	go worker.start()
 
 	return worker
@@ -117,11 +118,12 @@ func (w *DiskWorker) processRead(req interfaces.DiskRequest) {
 
 	if err != nil {
 		result.Error = fmt.Errorf("page %d not found on disk", req.PageNumber)
-	} else {
-		if err := req.Page.FromBytes(data); err != nil {
-			result.Error = fmt.Errorf("failed to deserialize page %d: %v", req.PageNumber, err)
-		}
 	}
+	//} else {
+	//	if err := req.Page.FromBytes(data); err != nil {
+	//		result.Error = fmt.Errorf("failed to deserialize page %d: %v", req.PageNumber, err)
+	//	}
+	//}
 
 	req.ResultChan <- result
 }
@@ -138,18 +140,16 @@ func (w *DiskWorker) processWrite(req interfaces.DiskRequest) {
 		return
 	}
 
+	pData := data.([]byte)
+
 	w.lock.Lock()
-	err = w.blockIO.Write(int(req.PageNumber), data.([]byte))
+	err = w.blockIO.Write(int(req.PageNumber), pData)
 	w.lock.Unlock()
 
 	result := interfaces.DiskResult{PageNumber: req.PageNumber, Page: req.Page}
 
 	if err != nil {
 		result.Error = fmt.Errorf("page %d not found on disk", req.PageNumber)
-	} else {
-		if err := req.Page.FromBytes(data); err != nil {
-			result.Error = fmt.Errorf("failed to deserialize page %d: %v", req.PageNumber, err)
-		}
 	}
 
 	req.ResultChan <- interfaces.DiskResult{PageNumber: req.PageNumber, Page: req.Page}
