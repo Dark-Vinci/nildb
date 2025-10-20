@@ -138,7 +138,7 @@ func (f *File) Create() (interfaces.IOOperator, error) {
 
 func (f *File) Open() (interfaces.IOOperator, error) {
 	if f.path == "" {
-		return interfaces.IOOperator(nil), errors.New("file path cannot be empty")
+		return nil, errors.New("file path cannot be empty")
 	}
 
 	if f.f != nil {
