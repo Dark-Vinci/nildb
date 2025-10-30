@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"io"
 
-	"github.com/dark-vinci/nildb/interfaces"
+	"github.com/dark-vinci/nildb/faces"
 )
 
 type Block struct {
