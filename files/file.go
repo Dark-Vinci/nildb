@@ -1,7 +1,6 @@
 package files
 
 import (
-	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -25,7 +24,7 @@ func NewFile(path string) *File {
 
 func (f *File) Write(p []byte) (n int, err error) {
 	if f.f == nil {
-		return 0, errors.New("file is not open")
+		return 0, ErrFileDoesNotExist
 	}
 
 	write, err := f.f.Write(p)
@@ -39,7 +38,7 @@ func (f *File) Write(p []byte) (n int, err error) {
 
 func (f *File) Read(p []byte) (n int, err error) {
 	if f.f == nil {
-		return 0, errors.New("file is not open")
+		return 0, ErrFileNotOpened
 	}
 
 	val, err := f.f.Read(p)
@@ -53,7 +52,7 @@ func (f *File) Read(p []byte) (n int, err error) {
 
 func (f *File) Seek(offset int64, whence int) (int64, error) {
 	if f.f == nil {
-		return 0, errors.New("file is not open")
+		return 0, ErrFileNotOpened
 	}
 
 	n, err := f.f.Seek(offset, whence)
@@ -67,7 +66,7 @@ func (f *File) Seek(offset int64, whence int) (int64, error) {
 
 func (f *File) Close() error {
 	if f.f == nil {
-		return errors.New("file is not open")
+		return ErrFileNotOpened
 	}
 
 	if err := f.f.Close(); err != nil {
@@ -80,7 +79,7 @@ func (f *File) Close() error {
 
 func (f *File) Remove() error {
 	if f.path != "" {
-		return errors.New("file path cannot be empty")
+		return ErrFilePathISNil
 	}
 
 	if err := os.Remove(f.path); err != nil {
@@ -93,7 +92,7 @@ func (f *File) Remove() error {
 
 func (f *File) Truncate() error {
 	if f.f == nil {
-		return errors.New("file is not open")
+		return ErrFileNotOpened
 	}
 
 	if err := os.Truncate(f.path, 0); err != nil {
@@ -115,20 +114,20 @@ func (f *File) Sync() error {
 
 func (f *File) Create() (interfaces.IOOperator, error) {
 	if f.path == "" {
-		return interfaces.IOOperator(nil), errors.New("file path cannot be empty")
+		return nil, ErrFilePathISNil
 	}
 
 	if parent := filepath.Dir(f.path); parent != "" {
 		if err := os.MkdirAll(parent, 0755); err != nil {
 			fmt.Println("Error: directory cannot be created", err)
-			return interfaces.IOOperator(nil), err
+			return nil, err
 		}
 	}
 
 	file, err := os.OpenFile(f.path, os.O_CREATE|os.O_TRUNC|os.O_RDWR, 0644)
 	if err != nil {
 		fmt.Println("Error: file cannot be created", err)
-		return interfaces.IOOperator(nil), err
+		return nil, err
 	}
 
 	f.f = file
@@ -138,7 +137,7 @@ func (f *File) Create() (interfaces.IOOperator, error) {
 
 func (f *File) Open() (interfaces.IOOperator, error) {
 	if f.path == "" {
-		return nil, errors.New("file path cannot be empty")
+		return nil, ErrFilePathISNil
 	}
 
 	if f.f != nil {
@@ -148,7 +147,7 @@ func (f *File) Open() (interfaces.IOOperator, error) {
 	file, err := os.OpenFile(f.path, os.O_RDWR, 0644)
 	if err != nil {
 		fmt.Println("Error: file cannot be opened", err)
-		return interfaces.IOOperator(nil), err
+		return nil, err
 	}
 
 	f.f = file
