@@ -2,10 +2,10 @@ package files
 
 import (
 	"bytes"
-	"errors"
 	"io"
 
-	"github.com/dark-vinci/nildb/interfaces"
+	"github.com/dark-vinci/nildb/errors"
+	"github.com/dark-vinci/nildb/faces"
 )
 
 type MemFile struct {
@@ -13,17 +13,30 @@ type MemFile struct {
 	position int
 }
 
-var _ interfaces.IOOperator = (*MemFile)(nil)
+// majorly for test and simulate in memory database
+var _ faces.IOOperator = (*MemFile)(nil)
 
 func (m *MemFile) Write(p []byte) (n int, err error) {
+	if m.buf == nil {
+		m.buf = new(bytes.Buffer)
+	}
+
 	return m.buf.Write(p)
 }
 
 func (m *MemFile) Read(p []byte) (n int, err error) {
+	if m.buf == nil {
+		m.buf = new(bytes.Buffer)
+	}
+
 	return bytes.NewReader(m.buf.Bytes()[m.position:]).Read(p)
 }
 
 func (m *MemFile) Seek(offset int64, whence int) (int64, error) {
+	if m.buf == nil {
+		m.buf = new(bytes.Buffer)
+	}
+
 	size, lastPosition := int64(m.buf.Len()), int64(m.position)
 
 	switch whence {
@@ -34,11 +47,11 @@ func (m *MemFile) Seek(offset int64, whence int) (int64, error) {
 	case io.SeekEnd:
 		lastPosition = size + offset
 	default:
-		return 0, errors.New("invalid whence")
+		return 0, errors.ErrInvalidWhence
 	}
 
 	if lastPosition < 0 {
-		return 0, errors.New("invalid position")
+		return 0, errors.ErrInvalidPointerPosition
 	}
 
 	m.position = int(lastPosition)
@@ -47,11 +60,9 @@ func (m *MemFile) Seek(offset int64, whence int) (int64, error) {
 }
 
 func (m *MemFile) Close() error {
-	if m.buf == nil {
-		return errors.New("file already closed")
+	if m.buf != nil {
+		m.buf = nil // drop reference so it's unusable
 	}
-
-	m.buf = nil // drop reference so it's unusable
 
 	return nil
 }
@@ -63,6 +74,10 @@ func (m *MemFile) Remove() error {
 }
 
 func (m *MemFile) Truncate() error {
+	if m.buf != nil {
+		m.buf = new(bytes.Buffer)
+	}
+
 	m.buf.Reset()
 	m.position = 0
 
@@ -73,14 +88,14 @@ func (m *MemFile) Sync() error {
 	return nil
 }
 
-func (m *MemFile) Create() (interfaces.IOOperator, error) {
+func (m *MemFile) Create() (faces.IOOperator, error) {
 	return &MemFile{
 		buf:      &bytes.Buffer{},
 		position: 0,
 	}, nil
 }
 
-func (m *MemFile) Open() (interfaces.IOOperator, error) {
+func (m *MemFile) Open() (faces.IOOperator, error) {
 	return &MemFile{
 		buf:      &bytes.Buffer{},
 		position: 0,

@@ -7,13 +7,13 @@ import (
 
 type Frame struct {
 	PageNumber base.PageNumber
-	Page       interfaces.RepPage
+	Page       faces.PageHandle
 	History    []uint64
 	Last       uint64
 	Flags      uint8
 }
 
-func NewFrame(pageNumber base.PageNumber, page interfaces.RepPage) *Frame {
+func NewFrame(pageNumber base.PageNumber, page faces.PageHandle) *Frame {
 	return &Frame{
 		PageNumber: pageNumber,
 		Page:       page,
@@ -40,5 +40,5 @@ func (f *Frame) IsSet(flags uint8) bool {
 
 // IsOverflow checks if the page is an overflow page
 func (f *Frame) IsOverflow() bool {
-	return f.Page.IsOverFlow()
+	return f.Page.IsOverflow()
 }

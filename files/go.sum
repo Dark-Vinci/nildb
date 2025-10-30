@@ -1,0 +1,4 @@
+github.com/dark-vinci/nildb/errors v0.0.0-20251018072022-ff423055cd16 h1:rXoMtIUXhRlmPE2UCJ0g1yplLs392w/v3sMhtjtMDtc=
+github.com/dark-vinci/nildb/errors v0.0.0-20251018072022-ff423055cd16/go.mod h1:y4Ws1o0Ii5abou7l/DeZQK0ijqDGYwXU/P1l2xRMoRI=
+github.com/dark-vinci/nildb/interfaces v0.0.0-20251018072022-ff423055cd16 h1:w6CO5kbzGHVaBvcD+i20N3MMz+qMLZEy1Ps6Fo3tGHg=
+github.com/dark-vinci/nildb/interfaces v0.0.0-20251018072022-ff423055cd16/go.mod h1:DpzMcQhYB1qLGJsz9oP/aYJ3FyYem/urC1j6bKMXvKk=

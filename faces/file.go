@@ -1,4 +1,4 @@
-package interfaces
+package faces
 
 import (
 	"io"
@@ -13,7 +13,6 @@ type IOOperator interface {
 	Remove() error
 	Truncate() error
 	Sync() error
-	//Flush() error
 	Create() (IOOperator, error)
 	Open() (IOOperator, error)
 }

@@ -4,12 +4,17 @@ import (
 	"math"
 
 	"github.com/dark-vinci/nildb/base"
-	"github.com/dark-vinci/nildb/cache/frame"
 	"github.com/dark-vinci/nildb/constants"
+	"github.com/dark-vinci/nildb/frame"
 	"github.com/dark-vinci/nildb/interfaces"
+	"github.com/dark-vinci/nildb/pages"
 )
 
-func (c *Cache) Load(pageNumber base.PageNumber, page *interfaces.RepPage) *interfaces.RepPage {
+func (c *Cache) Load(pageNumber base.PageNumber, page *faces.PageHandle) *faces.PageHandle {
+	if page == nil {
+		return nil
+	}
+
 	frameID := c.Map(pageNumber)
 	oldPage := c.Buffer[frameID].Page
 
@@ -25,6 +30,7 @@ func (c *Cache) MustEvictDirtyPage() bool {
 	}
 
 	victim := c.findVictim()
+
 	return c.Buffer[victim].IsSet(constants.DirtyFlag)
 }
 
@@ -32,7 +38,7 @@ func (c *Cache) findVictim() base.FrameID {
 	var (
 		t             = c.CurrentTime
 		minVal        = uint64(math.MaxUint64)
-		victim        = ^base.FrameID(0)
+		victim        = ^base.FrameID(0) // base.FrameID(uint64(math.MaxUint64))
 		foundEligible = false
 	)
 
@@ -99,6 +105,7 @@ func (c *Cache) setFlags(pageNumber base.PageNumber, flags uint8) bool {
 		c.Buffer[frameId].Set(flags)
 		return true
 	}
+
 	return false
 }
 
@@ -107,19 +114,22 @@ func (c *Cache) Map(pageNumber base.PageNumber) base.FrameID {
 		return frameID
 	}
 
-	var frameID base.FrameID
-	f := &frame.Frame{}
+	var (
+		frameID base.FrameID
+		f       = &frame.Frame{}
+	)
 
-	// Buffer not full, allocate new page
+	// Buffer is not full, allocate a new page
 	if uint(len(c.Buffer)) < c.MaxSize {
 		frameID = base.FrameID(len(c.Buffer))
-		f = frame.NewFrame(pageNumber, MemPage{Data: make([]byte, c.PageSize)})
+		f = frame.NewFrame(pageNumber, pages.Alloc(int(c.PageSize)))
 
 		c.Buffer = append(c.Buffer, f)
 	} else {
-		// Buffer full, find victim to evict
-		victimId := c.findVictim()
-		f = c.Buffer[victimId]
+		// Buffer full, find a victim to evict
+		victimID := c.findVictim()
+
+		f = c.Buffer[victimID]
 
 		delete(c.Pages, f.PageNumber)
 
@@ -134,9 +144,11 @@ func (c *Cache) Map(pageNumber base.PageNumber) base.FrameID {
 	return frameID
 }
 
-func (c *Cache) updateHistory(frameId base.FrameID) {
-	fram := c.Buffer[frameId]
+func (c *Cache) updateHistory(frameID base.FrameID) {
+	fram := c.Buffer[frameID]
+
 	c.CurrentTime++
+
 	t := c.CurrentTime
 
 	if len(fram.History) == 0 {
@@ -218,6 +230,6 @@ func (c *Cache) Invalidate(pageNumber base.PageNumber) {
 }
 
 // GetFrame retrieves the MemPage for a given FrameId
-func (c *Cache) GetFrame(frameID base.FrameID) *interfaces.RepPage {
+func (c *Cache) GetFrame(frameID base.FrameID) *faces.PageHandle {
 	return &c.Buffer[frameID].Page
 }

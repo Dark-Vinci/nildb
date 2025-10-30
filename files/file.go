@@ -1,12 +1,12 @@
 package files
 
 import (
-	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
 
-	"github.com/dark-vinci/nildb/interfaces"
+	"github.com/dark-vinci/nildb/errors"
+	"github.com/dark-vinci/nildb/faces"
 )
 
 type File struct {
@@ -14,7 +14,7 @@ type File struct {
 	f    *os.File
 }
 
-var _ interfaces.IOOperator = (*File)(nil)
+var _ faces.IOOperator = (*File)(nil)
 
 func NewFile(path string) *File {
 	return &File{
@@ -25,7 +25,7 @@ func NewFile(path string) *File {
 
 func (f *File) Write(p []byte) (n int, err error) {
 	if f.f == nil {
-		return 0, errors.New("file is not open")
+		return 0, errors.ErrFileDoesNotExist
 	}
 
 	write, err := f.f.Write(p)
@@ -39,7 +39,7 @@ func (f *File) Write(p []byte) (n int, err error) {
 
 func (f *File) Read(p []byte) (n int, err error) {
 	if f.f == nil {
-		return 0, errors.New("file is not open")
+		return 0, errors.ErrFileNotOpened
 	}
 
 	val, err := f.f.Read(p)
@@ -53,7 +53,7 @@ func (f *File) Read(p []byte) (n int, err error) {
 
 func (f *File) Seek(offset int64, whence int) (int64, error) {
 	if f.f == nil {
-		return 0, errors.New("file is not open")
+		return 0, errors.ErrFileNotOpened
 	}
 
 	n, err := f.f.Seek(offset, whence)
@@ -67,7 +67,7 @@ func (f *File) Seek(offset int64, whence int) (int64, error) {
 
 func (f *File) Close() error {
 	if f.f == nil {
-		return errors.New("file is not open")
+		return errors.ErrFileNotOpened
 	}
 
 	if err := f.f.Close(); err != nil {
@@ -80,7 +80,7 @@ func (f *File) Close() error {
 
 func (f *File) Remove() error {
 	if f.path != "" {
-		return errors.New("file path cannot be empty")
+		return errors.ErrFilePathISNil
 	}
 
 	if err := os.Remove(f.path); err != nil {
@@ -93,7 +93,7 @@ func (f *File) Remove() error {
 
 func (f *File) Truncate() error {
 	if f.f == nil {
-		return errors.New("file is not open")
+		return errors.ErrFileNotOpened
 	}
 
 	if err := os.Truncate(f.path, 0); err != nil {
@@ -113,22 +113,22 @@ func (f *File) Sync() error {
 	return nil
 }
 
-func (f *File) Create() (interfaces.IOOperator, error) {
+func (f *File) Create() (faces.IOOperator, error) {
 	if f.path == "" {
-		return interfaces.IOOperator(nil), errors.New("file path cannot be empty")
+		return nil, errors.ErrFilePathISNil
 	}
 
 	if parent := filepath.Dir(f.path); parent != "" {
 		if err := os.MkdirAll(parent, 0755); err != nil {
 			fmt.Println("Error: directory cannot be created", err)
-			return interfaces.IOOperator(nil), err
+			return nil, err
 		}
 	}
 
 	file, err := os.OpenFile(f.path, os.O_CREATE|os.O_TRUNC|os.O_RDWR, 0644)
 	if err != nil {
 		fmt.Println("Error: file cannot be created", err)
-		return interfaces.IOOperator(nil), err
+		return nil, err
 	}
 
 	f.f = file
@@ -136,9 +136,9 @@ func (f *File) Create() (interfaces.IOOperator, error) {
 	return f, nil
 }
 
-func (f *File) Open() (interfaces.IOOperator, error) {
+func (f *File) Open() (faces.IOOperator, error) {
 	if f.path == "" {
-		return interfaces.IOOperator(nil), errors.New("file path cannot be empty")
+		return nil, errors.ErrFilePathISNil
 	}
 
 	if f.f != nil {
@@ -148,7 +148,7 @@ func (f *File) Open() (interfaces.IOOperator, error) {
 	file, err := os.OpenFile(f.path, os.O_RDWR, 0644)
 	if err != nil {
 		fmt.Println("Error: file cannot be opened", err)
-		return interfaces.IOOperator(nil), err
+		return nil, err
 	}
 
 	f.f = file
