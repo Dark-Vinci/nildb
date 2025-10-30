@@ -1,4 +1,4 @@
-package interfaces
+package faces
 
 type PageHandle interface {
 	IsOverflow() bool

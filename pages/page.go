@@ -21,7 +21,7 @@ func (p *Page) IsOverflow() bool {
 	return false
 }
 
-func (p *Page) FromBuffer(buffer []byte) interfaces.PageHandle {
+func (p *Page) FromBuffer(buffer []byte) faces.PageHandle {
 	p.buffer = bufferwheader.FromSlice[PageHeader](buffer)
 
 	return p
@@ -31,17 +31,17 @@ func (p *Page) IntoBuffer() (interface{}, error) {
 	return p.buffer, nil
 }
 
-func (p *Page) FromPageHeader(header *bufferwheader.BufferWithHeader[PageHeader]) interfaces.PageHandle {
+func (p *Page) FromPageHeader(header *bufferwheader.BufferWithHeader[PageHeader]) faces.PageHandle {
 	return &Page{buffer: header}
 }
 
-func (p *Page) FromOverflowPageHeader(buffer *bufferwheader.BufferWithHeader[OverflowPageHeader]) interfaces.PageHandle {
+func (p *Page) FromOverflowPageHeader(buffer *bufferwheader.BufferWithHeader[OverflowPageHeader]) faces.PageHandle {
 	return &Page{
 		buffer: bufferwheader.NewBufferWithHeader[PageHeader](buffer.Size()),
 	}
 }
 
-func (p *Page) FromDBHeader(buffer *bufferwheader.BufferWithHeader[DBHeader]) interfaces.PageHandle {
+func (p *Page) FromDBHeader(buffer *bufferwheader.BufferWithHeader[DBHeader]) faces.PageHandle {
 	return &Page{
 		buffer: bufferwheader.NewBufferWithHeader[PageHeader](buffer.Size()),
 	}

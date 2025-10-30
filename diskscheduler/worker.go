@@ -13,7 +13,7 @@ import (
 )
 
 type DiskWorker struct {
-	queue     chan interfaces.DiskRequest
+	queue     chan faces.DiskRequest
 	blockIO   blocks.Block
 	lock      sync.RWMutex
 	stopChan  chan struct{}
@@ -21,11 +21,11 @@ type DiskWorker struct {
 	pageSize  uint
 }
 
-var _ interfaces.DiskWorkerOps = (*DiskWorker)(nil)
+var _ faces.DiskWorkerOps = (*DiskWorker)(nil)
 
 func NewDiskWorker(block blocks.Block) *DiskWorker {
 	worker := &DiskWorker{
-		queue:     make(chan interfaces.DiskRequest, 100),
+		queue:     make(chan faces.DiskRequest, 100),
 		blockIO:   block,
 		stopChan:  make(chan struct{}),
 		lock:      sync.RWMutex{},
@@ -43,7 +43,7 @@ func (w *DiskWorker) start() {
 	defer w.waitGroup.Done()
 
 	var (
-		batch  = make([]interfaces.DiskRequest, 0, constants.BatchSize)
+		batch  = make([]faces.DiskRequest, 0, constants.BatchSize)
 		ticker = time.NewTicker(constants.BatchTimeout)
 	)
 
@@ -77,11 +77,11 @@ func (w *DiskWorker) start() {
 	}
 }
 
-func (w *DiskWorker) processBatch(batch []interfaces.DiskRequest) {
+func (w *DiskWorker) processBatch(batch []faces.DiskRequest) {
 	// Separate reads and writes
 	var (
-		reads  []interfaces.DiskRequest
-		writes []interfaces.DiskRequest
+		reads  []faces.DiskRequest
+		writes []faces.DiskRequest
 	)
 
 	for _, req := range batch {
@@ -107,14 +107,14 @@ func (w *DiskWorker) processBatch(batch []interfaces.DiskRequest) {
 	}
 }
 
-func (w *DiskWorker) processRead(req interfaces.DiskRequest) {
+func (w *DiskWorker) processRead(req faces.DiskRequest) {
 	data := make([]byte, w.pageSize)
 
 	w.lock.RLock()
 	err := w.blockIO.Read(int(req.PageNumber), data)
 	w.lock.RUnlock()
 
-	result := interfaces.DiskResult{PageNumber: req.PageNumber, Page: req.Page}
+	result := faces.DiskResult{PageNumber: req.PageNumber, Page: req.Page}
 
 	if err != nil {
 		result.Error = fmt.Errorf("page %d not found on disk", req.PageNumber)
@@ -128,11 +128,11 @@ func (w *DiskWorker) processRead(req interfaces.DiskRequest) {
 	req.ResultChan <- result
 }
 
-func (w *DiskWorker) processWrite(req interfaces.DiskRequest) {
+func (w *DiskWorker) processWrite(req faces.DiskRequest) {
 	data, err := req.Page.IntoBuffer()
 
 	if err != nil {
-		req.ResultChan <- interfaces.DiskResult{
+		req.ResultChan <- faces.DiskResult{
 			PageNumber: req.PageNumber,
 			Error:      fmt.Errorf("failed to serialize page %d: %v", req.PageNumber, err),
 		}
@@ -146,11 +146,11 @@ func (w *DiskWorker) processWrite(req interfaces.DiskRequest) {
 	err = w.blockIO.Write(int(req.PageNumber), pData)
 	w.lock.Unlock()
 
-	result := interfaces.DiskResult{PageNumber: req.PageNumber, Page: req.Page}
+	result := faces.DiskResult{PageNumber: req.PageNumber, Page: req.Page}
 
 	if err != nil {
 		result.Error = fmt.Errorf("page %d not found on disk", req.PageNumber)
 	}
 
-	req.ResultChan <- interfaces.DiskResult{PageNumber: req.PageNumber, Page: req.Page}
+	req.ResultChan <- faces.DiskResult{PageNumber: req.PageNumber, Page: req.Page}
 }

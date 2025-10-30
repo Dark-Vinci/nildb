@@ -8,7 +8,7 @@ import (
 type Builder struct {
 	BlockSize uint32
 	PageSize  uint32
-	Cache     *interfaces.Cache
+	Cache     *faces.Cache
 }
 
 func NewBuilder() *Builder {
@@ -29,7 +29,7 @@ func (b *Builder) SetPageSize(pageSize uint32) *Builder {
 	return b
 }
 
-func (b *Builder) SetCache(cache interfaces.Cache) *Builder {
+func (b *Builder) SetCache(cache faces.Cache) *Builder {
 	b.Cache = &cache
 	return b
 }

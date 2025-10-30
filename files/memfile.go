@@ -5,7 +5,7 @@ import (
 	"io"
 
 	"github.com/dark-vinci/nildb/errors"
-	"github.com/dark-vinci/nildb/interfaces"
+	"github.com/dark-vinci/nildb/faces"
 )
 
 type MemFile struct {
@@ -14,7 +14,7 @@ type MemFile struct {
 }
 
 // majorly for test and simulate in memory database
-var _ interfaces.IOOperator = (*MemFile)(nil)
+var _ faces.IOOperator = (*MemFile)(nil)
 
 func (m *MemFile) Write(p []byte) (n int, err error) {
 	if m.buf == nil {
@@ -88,14 +88,14 @@ func (m *MemFile) Sync() error {
 	return nil
 }
 
-func (m *MemFile) Create() (interfaces.IOOperator, error) {
+func (m *MemFile) Create() (faces.IOOperator, error) {
 	return &MemFile{
 		buf:      &bytes.Buffer{},
 		position: 0,
 	}, nil
 }
 
-func (m *MemFile) Open() (interfaces.IOOperator, error) {
+func (m *MemFile) Open() (faces.IOOperator, error) {
 	return &MemFile{
 		buf:      &bytes.Buffer{},
 		position: 0,

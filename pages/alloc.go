@@ -5,14 +5,14 @@ import (
 	"github.com/dark-vinci/nildb/interfaces"
 )
 
-func Alloc(size int) interfaces.PageHandle {
+func Alloc(size int) faces.PageHandle {
 	return &Page{buffer: bufferwheader.ForPage[PageHeader](size)}
 }
 
-func ReinitAs[T PageTypeConversion](memPage *interfaces.PageHandle) {
+func ReinitAs[T PageTypeConversion](memPage *faces.PageHandle) {
 	var (
 		current = *memPage
-		newPage interfaces.PageHandle
+		newPage faces.PageHandle
 		t       T
 	)
 

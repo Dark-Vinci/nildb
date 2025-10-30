@@ -6,7 +6,7 @@ import (
 	"path/filepath"
 
 	"github.com/dark-vinci/nildb/errors"
-	"github.com/dark-vinci/nildb/interfaces"
+	"github.com/dark-vinci/nildb/faces"
 )
 
 type File struct {
@@ -14,7 +14,7 @@ type File struct {
 	f    *os.File
 }
 
-var _ interfaces.IOOperator = (*File)(nil)
+var _ faces.IOOperator = (*File)(nil)
 
 func NewFile(path string) *File {
 	return &File{
@@ -113,7 +113,7 @@ func (f *File) Sync() error {
 	return nil
 }
 
-func (f *File) Create() (interfaces.IOOperator, error) {
+func (f *File) Create() (faces.IOOperator, error) {
 	if f.path == "" {
 		return nil, errors.ErrFilePathISNil
 	}
@@ -136,7 +136,7 @@ func (f *File) Create() (interfaces.IOOperator, error) {
 	return f, nil
 }
 
-func (f *File) Open() (interfaces.IOOperator, error) {
+func (f *File) Open() (faces.IOOperator, error) {
 	if f.path == "" {
 		return nil, errors.ErrFilePathISNil
 	}

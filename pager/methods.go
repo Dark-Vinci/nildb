@@ -12,7 +12,7 @@ import (
 	"github.com/dark-vinci/nildb/pages"
 )
 
-func (p *Pager) GetNewPage(pin bool) (*interfaces.PageHandle, base.PageNumber, error) {
+func (p *Pager) GetNewPage(pin bool) (*faces.PageHandle, base.PageNumber, error) {
 	var (
 		pn        = p.AllocatePage()
 		page, err = p.GetPage(pn, pin)

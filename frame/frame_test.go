@@ -155,7 +155,7 @@ func TestIsSet(t *testing.T) {
 func TestIsOverflow(t *testing.T) {
 	tests := []struct {
 		name     string
-		page     interfaces.RepPage
+		page     faces.RepPage
 		expected bool
 	}{
 		{

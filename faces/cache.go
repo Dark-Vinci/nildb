@@ -1,4 +1,4 @@
-package interfaces
+package faces
 
 import "github.com/dark-vinci/nildb/base"
 

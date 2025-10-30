@@ -10,7 +10,7 @@ import (
 	"github.com/dark-vinci/nildb/pages"
 )
 
-func (c *Cache) Load(pageNumber base.PageNumber, page *interfaces.PageHandle) *interfaces.PageHandle {
+func (c *Cache) Load(pageNumber base.PageNumber, page *faces.PageHandle) *faces.PageHandle {
 	if page == nil {
 		return nil
 	}
@@ -230,6 +230,6 @@ func (c *Cache) Invalidate(pageNumber base.PageNumber) {
 }
 
 // GetFrame retrieves the MemPage for a given FrameId
-func (c *Cache) GetFrame(frameID base.FrameID) *interfaces.PageHandle {
+func (c *Cache) GetFrame(frameID base.FrameID) *faces.PageHandle {
 	return &c.Buffer[frameID].Page
 }

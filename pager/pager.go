@@ -9,8 +9,8 @@ import (
 )
 
 type Pager struct {
-	worker         interfaces.DiskWorkerOps
-	cache          interfaces.Cache
+	worker         faces.DiskWorkerOps
+	cache          faces.Cache
 	lock           sync.Mutex
 	freePages      utils.Uint64Heap
 	nextPageNumber base.PageNumber

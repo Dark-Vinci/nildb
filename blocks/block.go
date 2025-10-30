@@ -8,15 +8,15 @@ import (
 )
 
 type Block struct {
-	ioOperator interfaces.IOOperator
+	ioOperator faces.IOOperator
 	blockSize  int
 	pageSize   int
 }
 
-var _ interfaces.BlockOperations = (*Block)(nil)
+var _ faces.BlockOperations = (*Block)(nil)
 
 func NewBlock(
-	ioOperator interfaces.IOOperator,
+	ioOperator faces.IOOperator,
 	blockSize int,
 	pageSize int,
 ) *Block {

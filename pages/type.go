@@ -6,8 +6,8 @@ import (
 )
 
 type PageTypeConversion interface {
-	interfaces.PageHandle
-	FromPageHeader(header *bufferwheader.BufferWithHeader[PageHeader]) interfaces.PageHandle
-	FromOverflowPageHeader(header *bufferwheader.BufferWithHeader[OverflowPageHeader]) interfaces.PageHandle
-	FromDBHeader(header *bufferwheader.BufferWithHeader[DBHeader]) interfaces.PageHandle
+	faces.PageHandle
+	FromPageHeader(header *bufferwheader.BufferWithHeader[PageHeader]) faces.PageHandle
+	FromOverflowPageHeader(header *bufferwheader.BufferWithHeader[OverflowPageHeader]) faces.PageHandle
+	FromDBHeader(header *bufferwheader.BufferWithHeader[DBHeader]) faces.PageHandle
 }

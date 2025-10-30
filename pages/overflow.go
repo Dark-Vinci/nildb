@@ -20,7 +20,7 @@ func (o *OverflowPage) IsOverflow() bool {
 	return true
 }
 
-func (o *OverflowPage) FromBuffer(buffer []byte) interfaces.PageHandle {
+func (o *OverflowPage) FromBuffer(buffer []byte) faces.PageHandle {
 	o.buffer = bufferwheader.FromSlice[OverflowPageHeader](buffer)
 
 	return o
@@ -30,17 +30,17 @@ func (o *OverflowPage) IntoBuffer() (interface{}, error) {
 	return o.buffer, nil
 }
 
-func (o *OverflowPage) FromPageHeader(buffer *bufferwheader.BufferWithHeader[PageHeader]) interfaces.PageHandle {
+func (o *OverflowPage) FromPageHeader(buffer *bufferwheader.BufferWithHeader[PageHeader]) faces.PageHandle {
 	return &OverflowPage{
 		buffer: bufferwheader.NewBufferWithHeader[OverflowPageHeader](buffer.Size()),
 	}
 }
 
-func (o *OverflowPage) FromOverflowPageHeader(buffer *bufferwheader.BufferWithHeader[OverflowPageHeader]) interfaces.PageHandle {
+func (o *OverflowPage) FromOverflowPageHeader(buffer *bufferwheader.BufferWithHeader[OverflowPageHeader]) faces.PageHandle {
 	return &OverflowPage{buffer: buffer}
 }
 
-func (o *OverflowPage) FromDBHeader(buffer *bufferwheader.BufferWithHeader[DBHeader]) interfaces.PageHandle {
+func (o *OverflowPage) FromDBHeader(buffer *bufferwheader.BufferWithHeader[DBHeader]) faces.PageHandle {
 	return &OverflowPage{
 		buffer: bufferwheader.NewBufferWithHeader[OverflowPageHeader](buffer.Size()),
 	}

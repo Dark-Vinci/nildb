@@ -30,25 +30,25 @@ func (p *PageZero) IntoBuffer() (interface{}, error) {
 	return p.buffer, nil
 }
 
-func (p *PageZero) FromBuffer(buffer []byte) interfaces.PageHandle {
+func (p *PageZero) FromBuffer(buffer []byte) faces.PageHandle {
 	p.buffer = bufferwheader.FromSlice[DBHeader](buffer)
 
 	return p
 }
 
-func (p *PageZero) FromPageHeader(buffer *bufferwheader.BufferWithHeader[PageHeader]) interfaces.PageHandle {
+func (p *PageZero) FromPageHeader(buffer *bufferwheader.BufferWithHeader[PageHeader]) faces.PageHandle {
 	return &PageZero{
 		buffer: bufferwheader.NewBufferWithHeader[DBHeader](buffer.Size()),
 	}
 }
 
-func (p *PageZero) FromOverflowPageHeader(buffer *bufferwheader.BufferWithHeader[OverflowPageHeader]) interfaces.PageHandle {
+func (p *PageZero) FromOverflowPageHeader(buffer *bufferwheader.BufferWithHeader[OverflowPageHeader]) faces.PageHandle {
 	return &PageZero{
 		buffer: bufferwheader.NewBufferWithHeader[DBHeader](buffer.Size()),
 	}
 }
 
-func (p *PageZero) FromDBHeader(buffer *bufferwheader.BufferWithHeader[DBHeader]) interfaces.PageHandle {
+func (p *PageZero) FromDBHeader(buffer *bufferwheader.BufferWithHeader[DBHeader]) faces.PageHandle {
 	return &PageZero{buffer: buffer}
 }
 
