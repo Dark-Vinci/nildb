@@ -5,6 +5,7 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/dark-vinci/nildb/errors"
 	"github.com/dark-vinci/nildb/interfaces"
 )
 
@@ -24,7 +25,7 @@ func NewFile(path string) *File {
 
 func (f *File) Write(p []byte) (n int, err error) {
 	if f.f == nil {
-		return 0, ErrFileDoesNotExist
+		return 0, errors.ErrFileDoesNotExist
 	}
 
 	write, err := f.f.Write(p)
@@ -38,7 +39,7 @@ func (f *File) Write(p []byte) (n int, err error) {
 
 func (f *File) Read(p []byte) (n int, err error) {
 	if f.f == nil {
-		return 0, ErrFileNotOpened
+		return 0, errors.ErrFileNotOpened
 	}
 
 	val, err := f.f.Read(p)
@@ -52,7 +53,7 @@ func (f *File) Read(p []byte) (n int, err error) {
 
 func (f *File) Seek(offset int64, whence int) (int64, error) {
 	if f.f == nil {
-		return 0, ErrFileNotOpened
+		return 0, errors.ErrFileNotOpened
 	}
 
 	n, err := f.f.Seek(offset, whence)
@@ -66,7 +67,7 @@ func (f *File) Seek(offset int64, whence int) (int64, error) {
 
 func (f *File) Close() error {
 	if f.f == nil {
-		return ErrFileNotOpened
+		return errors.ErrFileNotOpened
 	}
 
 	if err := f.f.Close(); err != nil {
@@ -79,7 +80,7 @@ func (f *File) Close() error {
 
 func (f *File) Remove() error {
 	if f.path != "" {
-		return ErrFilePathISNil
+		return errors.ErrFilePathISNil
 	}
 
 	if err := os.Remove(f.path); err != nil {
@@ -92,7 +93,7 @@ func (f *File) Remove() error {
 
 func (f *File) Truncate() error {
 	if f.f == nil {
-		return ErrFileNotOpened
+		return errors.ErrFileNotOpened
 	}
 
 	if err := os.Truncate(f.path, 0); err != nil {
@@ -114,7 +115,7 @@ func (f *File) Sync() error {
 
 func (f *File) Create() (interfaces.IOOperator, error) {
 	if f.path == "" {
-		return nil, ErrFilePathISNil
+		return nil, errors.ErrFilePathISNil
 	}
 
 	if parent := filepath.Dir(f.path); parent != "" {
@@ -137,7 +138,7 @@ func (f *File) Create() (interfaces.IOOperator, error) {
 
 func (f *File) Open() (interfaces.IOOperator, error) {
 	if f.path == "" {
-		return nil, ErrFilePathISNil
+		return nil, errors.ErrFilePathISNil
 	}
 
 	if f.f != nil {

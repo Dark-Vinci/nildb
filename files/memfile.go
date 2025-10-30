@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"io"
 
+	"github.com/dark-vinci/nildb/errors"
 	"github.com/dark-vinci/nildb/interfaces"
 )
 
@@ -46,11 +47,11 @@ func (m *MemFile) Seek(offset int64, whence int) (int64, error) {
 	case io.SeekEnd:
 		lastPosition = size + offset
 	default:
-		return 0, ErrInvalidWhence
+		return 0, errors.ErrInvalidWhence
 	}
 
 	if lastPosition < 0 {
-		return 0, ErrInvalidPointerPosition
+		return 0, errors.ErrInvalidPointerPosition
 	}
 
 	m.position = int(lastPosition)
