@@ -5,8 +5,8 @@ import (
 
 	"github.com/dark-vinci/nildb/base"
 	"github.com/dark-vinci/nildb/constants"
+	"github.com/dark-vinci/nildb/faces"
 	"github.com/dark-vinci/nildb/frame"
-	"github.com/dark-vinci/nildb/interfaces"
 	"github.com/dark-vinci/nildb/pages"
 )
 
